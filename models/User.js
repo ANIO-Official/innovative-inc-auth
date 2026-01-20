@@ -25,12 +25,17 @@ const userSchema = new Schema({
 // Set up pre-save middleware to create password
 userSchema.pre("save", async function (next) {
   if (this.isNew || this.isModified("password")) { //check if new or updates
-    const saltRounds = 10; //10 is the base. But you can go further
+    const saltRounds = 11; //10 is the base. But you can go further
     this.password = await bcrypt.hash(this.password, saltRounds); //run hash
   }
  
-  next();
-});
+
+},
+
+userSchema.methods.isCorrectPassword = async function (password) {
+  return bcrypt.compare(password, this.password);
+}
+);
  
 //Compile and Export
 const User = mongoose.model('User', userSchema);
